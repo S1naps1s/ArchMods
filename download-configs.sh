@@ -11,7 +11,52 @@ read -p "Press y to confirm, n to cancel: " restartok
 
 if [ "$restartok" = "y" ] ; then
 	read -sp "Enter password for sudo: " sudoPW
+	read -p "Enter username for FreeNAS: " fnuser
+	read -sp "Enter password for FreeNAS: " fnpass
 
+	
+	package=steam
+	if pacman -Qs $package > /dev/null ; then
+		echo -e "\n"$package "is installed"
+	else
+		echo -e "\n"
+		echo $sudoPW | sudo -S pacman -S --noconfirm steam
+	fi
+	package=firefox
+	if pacman -Qs $package > /dev/null ; then
+		echo -e "\n"$package "is installed"
+	else
+		echo -e "\n"
+		echo $sudoPW | sudo -S pacman -S --noconfirm firefox
+	fi
+	package=thunar
+	if pacman -Qs $package > /dev/null ; then
+		echo -e "\n"$package "is installed"
+	else
+		echo -e "\n"
+		echo $sudoPW | sudo -S pacman -S --noconfirm thunar
+	fi
+	package=gvfs
+	if pacman -Qs $package > /dev/null ; then
+		echo -e "\n"$package "is installed"
+	else
+		echo -e "\n"
+		echo $sudoPW | sudo -S pacman -S --noconfirm gvfs
+	fi
+	package=gvfs-smb
+	if pacman -Qs $package > /dev/null ; then
+		echo -e "\n"$package "is installed"
+	else
+		echo -e "\n"
+		echo $sudoPW | sudo -S pacman -S --noconfirm gvfs-smb
+	fi
+	package=sshfs
+	if pacman -Qs $package > /dev/null ; then
+		echo -e "\n"$package "is installed"
+	else
+		echo -e "\n"
+		echo $sudoPW | sudo -S pacman -S --noconfirm sshfs
+	fi
 	package=cmatrix
 	if pacman -Qs $package > /dev/null ; then
 		echo -e "\n"$package "is installed"
@@ -23,7 +68,7 @@ if [ "$restartok" = "y" ] ; then
 	if pacman -Qs $package > /dev/null ; then
 		echo -e "\n"$package "is installed"
 	else
-		echo -e "\n"
+		echo -e "\n"$fnpass
 		echo $sudoPW | sudo -S pacman -S --noconfirm figlet
 	fi
 	package=fortune-mod
@@ -76,6 +121,21 @@ if [ "$restartok" = "y" ] ; then
 	echo $sudoPW | sudo -S mv -f $HOME/Downloads/GitConfigs/ArchMods/sddm.conf /etc/sddm.conf
 	echo "Config "$count ": /etc/sddm.conf done"
 
+	count=$[count+1]
+	echo $sudoPW | sudo -S mv -f $HOME/Downloads/GitConfigs/ArchMods/mnt-FreeNAS.mount /etc/systemd/system/mnt-FreeNAS.mount
+	echo "Config "$count ": /etc/sddm.conf done"
+		
+	echo $sudoPW | sudo -S mkdir /mnt/FreeNAS
+	echo $sudoPW | sudo -S mkdir /etc/samba/credentials
+	echo "username=$fnuser" >> /etc/samba/credentials/FreeNAS
+	echo "password=$fnpass" >> /etc/samba/credentials/FreeNAS	
+	sudo chown root:root /etc/samba/credentials
+	echo $sudoPW | sudo -S chmod 700 /etc/samba/credentials
+	echo $sudoPW | sudo -S chmod 600 /etc/samba/credentials/FreeNAS
+	sudo systemctl enable mnt-FreeNAS.mount
+	sudo systemctl start mnt-FreeNAS.mount
+	echo $sudoPW | sudo -S ln -s /mnt/FreeNAS $HOME/
+	
 	echo $sudoPW | sudo -S chmod 777 $HOME"/Downloads/GitConfigs/"
 	echo $sudoPW | sudo -S rm -Rf $HOME"/Downloads/GitConfigs/"
 
