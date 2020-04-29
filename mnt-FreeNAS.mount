@@ -1,0 +1,12 @@
+[Unit]
+Description=FreeNAS Share mounted at boot
+
+[Mount]
+What=//192.168.1.20/Backup
+Where=/mnt/FreeNAS
+Options=_netdev,credentials=/etc/samba/credentials/FreeNAS,iocharset=utf8,rw
+Type=cifs
+TimeoutSec=30
+
+[Install]
+WantedBy=multi-user.target
